@@ -7,7 +7,18 @@ class MoviesController < ApplicationController
   end
 
   def index
-#debug(params)
+    #PART 3 HW2
+    if session[:params].nil?
+      session[:params] = params
+    end
+    if params[:sort_by].nil? and params[:ratings].nil? and
+      ( session[:params][:sort_by] or session[:params][:ratings])
+      flash.keep
+      redirect_to movies_path( session[:params] )
+    else 
+      session[:params] = params
+    end
+    #PART 2 HW2
     @all_ratings = Movie.all.map(&:rating).uniq
     if session[:selected_ratings].nil?
       session[:selected_ratings] = @all_ratings
@@ -16,6 +27,7 @@ class MoviesController < ApplicationController
       session[:selected_ratings] = params[:ratings].keys
     end
     @selected_ratings = session[:selected_ratings]
+    #PART 1 HW1
     if( params[:sort] )
       @movies = Movie.where(rating: @selected_ratings).order(params[:sort_by] + " ASC")
       @hilite = params[:sort_by] 
