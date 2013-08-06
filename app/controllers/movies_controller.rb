@@ -7,11 +7,20 @@ class MoviesController < ApplicationController
   end
 
   def index
+#debug(params)
+    @all_ratings = Movie.all.map(&:rating).uniq
+    if session[:selected_ratings].nil?
+      session[:selected_ratings] = @all_ratings
+    end
+    if params[:ratings]
+      session[:selected_ratings] = params[:ratings].keys
+    end
+    @selected_ratings = session[:selected_ratings]
     if( params[:sort] )
-      @movies = Movie.order(params[:sort_by] + " ASC")
+      @movies = Movie.where(rating: @selected_ratings).order(params[:sort_by] + " ASC")
       @hilite = params[:sort_by] 
     else
-      @movies = Movie.all
+      @movies = Movie.where(rating: @selected_ratings)
     end
   end
 
